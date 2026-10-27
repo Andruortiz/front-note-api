@@ -12,7 +12,7 @@ export default function AppLayout() {
       <header>
         <span>Usuario: {auth.user?.profile.preferred_username}</span>
         <nav>
-          <Link to="/grupos">Grupos</Link> <Link to="/notas">Registrar nota</Link>
+          <Link to="/grupos">Grupos</Link>
         </nav>
         <button onClick={() => auth.signoutRedirect()}>Salir</button>
       </header>
