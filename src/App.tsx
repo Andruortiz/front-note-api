@@ -1,18 +1,23 @@
-import { useAuth } from 'react-oidc-context'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AppLayout from './pages/AppLayout'
+import GroupStudentsPage from './pages/GroupStudentsPage'
+import GroupsPage from './pages/GroupsPage'
+import HomePage from './pages/HomePage'
+import RegisterGradePage from './pages/RegisterGradePage'
+import StudentGradesPage from './pages/StudentGradesPage'
 
 export default function App() {
-  const auth = useAuth()
-
-  if (auth.isLoading) return <p>Cargando...</p>
-  if (auth.error) return <p>Error: {auth.error.message}</p>
-  if (!auth.isAuthenticated) {
-    return <button onClick={() => auth.signinRedirect()}>Iniciar sesión</button>
-  }
-
   return (
-      <div>
-        <p>Hola, {auth.user?.profile.preferred_username}</p>
-        <button onClick={() => auth.signoutRedirect()}>Salir</button>
-      </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/notas" element={<RegisterGradePage />} />
+          <Route path="/grupos" element={<GroupsPage />} />
+          <Route path="/grupos/:groupId" element={<GroupStudentsPage />} />
+          <Route path="/grupos/:groupId/estudiantes/:studentId" element={<StudentGradesPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
-} 
+}
