@@ -16,7 +16,7 @@ export default function AppLayout() {
           Sistema de Registro de Notas
         </span>
         <nav>
-          <Link to="/grupos">Grupos</Link>
+          <Link to="/groups">Grupos</Link>
         </nav>
         <span>Docente: {auth.user?.profile.preferred_username}</span>
         <button className="outline" onClick={() => auth.signoutRedirect()}>

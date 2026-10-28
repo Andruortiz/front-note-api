@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
@@ -24,7 +25,7 @@ interface RegistrationPeriod {
   open: boolean
 }
 
-interface RegisterGradeForm {
+interface GradeForm {
   score: string
 }
 
@@ -43,7 +44,7 @@ interface SectionProps {
   groupId?: string
   studentId?: string
   token?: string
-  onRegistered: () => Promise<unknown>
+  onChanged: () => Promise<unknown>
 }
 
 function GradeTypeSection({
@@ -55,26 +56,38 @@ function GradeTypeSection({
   groupId,
   studentId,
   token,
-  onRegistered,
+  onChanged,
 }: SectionProps) {
-  const { register, handleSubmit, reset } = useForm<RegisterGradeForm>()
+  const { register, handleSubmit, reset } = useForm<GradeForm>()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const gradePath = `/api/v1/groups/${groupId}/students/${studentId}/grades/${type}`
 
-  const mutation = useMutation({
-    mutationFn: (form: RegisterGradeForm) =>
-      apiFetch<{ id: string }>('/api/v1/notas-estudiante', token, {
+  const saveMutation = useMutation({
+    mutationFn: (form: GradeForm) => {
+      const score = form.score === '' ? null : Number(form.score)
+      if (grade) {
+        return apiFetch<unknown>(gradePath, token, { method: 'PUT', body: JSON.stringify({ score }) })
+      }
+      return apiFetch<unknown>('/api/v1/student-grades', token, {
         method: 'POST',
-        body: JSON.stringify({
-          groupId,
-          studentId,
-          type,
-          score: form.score === '' ? null : Number(form.score),
-        }),
-      }),
+        body: JSON.stringify({ groupId, studentId, type, score }),
+      })
+    },
     onSuccess: () => {
       reset({ score: '' })
-      return onRegistered()
+      return onChanged()
     },
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => apiFetch<void>(gradePath, token, { method: 'DELETE' }),
+    onSuccess: () => {
+      setConfirmingDelete(false)
+      return onChanged()
+    },
+  })
+
+  const error = saveMutation.error ?? deleteMutation.error
 
   return (
     <section className={`panel ${className}`}>
@@ -98,7 +111,7 @@ function GradeTypeSection({
         <p className="pending">Aún sin registrar</p>
       )}
 
-      <form onSubmit={handleSubmit((form) => mutation.mutate(form))}>
+      <form onSubmit={handleSubmit((form) => saveMutation.mutate(form))}>
         <fieldset className="entry">
           <legend>Ingresar nota</legend>
           <label>
@@ -106,16 +119,38 @@ function GradeTypeSection({
             <input {...register('score', { required: true })} inputMode="decimal" />
           </label>
           <p>
-            <button type="submit" disabled={mutation.isPending}>
-              Registrar calificación
+            <button type="submit" disabled={saveMutation.isPending}>
+              {grade ? 'Modificar calificación' : 'Registrar calificación'}
             </button>
           </p>
         </fieldset>
       </form>
 
-      {mutation.isError && (
+      {grade && (
+        <div className="removal">
+          {confirmingDelete ? (
+            <p>
+              ¿Eliminar la calificación registrada?{' '}
+              <button className="danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate()}>
+                Confirmar
+              </button>{' '}
+              <button className="secondary" onClick={() => setConfirmingDelete(false)}>
+                Cancelar
+              </button>
+            </p>
+          ) : (
+            <p>
+              <button className="danger" onClick={() => setConfirmingDelete(true)}>
+                Eliminar calificación
+              </button>
+            </p>
+          )}
+        </div>
+      )}
+
+      {error && (
         <p className="error">
-          {mutation.error instanceof ApiError ? mutation.error.message : 'Error inesperado.'}
+          {error instanceof ApiError ? error.message : 'Error inesperado.'}
         </p>
       )}
     </section>
@@ -132,13 +167,13 @@ export default function StudentGradesPage() {
   const grades = useQuery({
     queryKey: gradesKey,
     queryFn: () =>
-      apiFetch<StudentGrade[]>(`/api/v1/grupos/${groupId}/estudiantes/${studentId}/notas`, token),
+      apiFetch<StudentGrade[]>(`/api/v1/groups/${groupId}/students/${studentId}/grades`, token),
     enabled: !!token && !!groupId && !!studentId,
   })
 
   const periods = useQuery({
     queryKey: ['registration-periods'],
-    queryFn: () => apiFetch<RegistrationPeriod[]>('/api/v1/periodos-registro', token),
+    queryFn: () => apiFetch<RegistrationPeriod[]>('/api/v1/registration-periods', token),
     enabled: !!token,
   })
 
@@ -148,7 +183,7 @@ export default function StudentGradesPage() {
     <main>
       <h1>Calificaciones del estudiante</h1>
       <p>
-        <Link to={`/grupos/${groupId}`}>← Volver a estudiantes</Link>
+        <Link to={`/groups/${groupId}`}>← Volver a estudiantes</Link>
       </p>
 
       {(grades.isLoading || periods.isLoading) && <p>Cargando información…</p>}
@@ -171,7 +206,7 @@ export default function StudentGradesPage() {
               groupId={groupId}
               studentId={studentId}
               token={token}
-              onRegistered={() => queryClient.invalidateQueries({ queryKey: gradesKey })}
+              onChanged={() => queryClient.invalidateQueries({ queryKey: gradesKey })}
             />
           ))}
         </div>

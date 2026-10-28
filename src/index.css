@@ -147,6 +147,27 @@ button:disabled {
   cursor: wait;
 }
 
+button.secondary {
+  background: #fff;
+  color: #1f3a5f;
+}
+
+button.danger {
+  background: #fff;
+  border-color: #8a2c2c;
+  color: #8a2c2c;
+}
+
+button.danger:disabled {
+  background: #f0dede;
+  border-color: #8a2c2c;
+  color: #8a2c2c;
+}
+
+.removal p {
+  margin: 12px 0 0;
+}
+
 .hero {
   display: flex;
   flex: 1;

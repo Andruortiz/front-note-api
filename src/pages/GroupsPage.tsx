@@ -14,7 +14,7 @@ export default function GroupsPage() {
 
   const { data, error, isLoading } = useQuery({
     queryKey: ['groups'],
-    queryFn: () => apiFetch<Group[]>('/api/v1/grupos', token),
+    queryFn: () => apiFetch<Group[]>('/api/v1/groups', token),
     enabled: !!token,
   })
 
@@ -33,7 +33,7 @@ export default function GroupsPage() {
         <ul>
           {data.map((group) => (
             <li key={group.id}>
-              <Link to={`/grupos/${group.id}`}>{group.name}</Link>
+              <Link to={`/groups/${group.id}`}>{group.name}</Link>
             </li>
           ))}
         </ul>
