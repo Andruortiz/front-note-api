@@ -4,19 +4,25 @@ import { useAuth } from 'react-oidc-context'
 export default function AppLayout() {
   const auth = useAuth()
 
-  if (auth.isLoading) return <p>Cargando...</p>
+  if (auth.isLoading) return <p>Cargando información…</p>
   if (!auth.isAuthenticated) return <Navigate to="/" replace />
 
   return (
     <div>
+      <div className="topline" />
       <header>
-        <span>Usuario: {auth.user?.profile.preferred_username}</span>
+        <span className="brand">
+          <span className="monogram">SR</span>
+          Sistema de Registro de Notas
+        </span>
         <nav>
           <Link to="/grupos">Grupos</Link>
         </nav>
-        <button onClick={() => auth.signoutRedirect()}>Salir</button>
+        <span>Docente: {auth.user?.profile.preferred_username}</span>
+        <button className="outline" onClick={() => auth.signoutRedirect()}>
+          Cerrar sesión
+        </button>
       </header>
-      <hr />
       <Outlet />
     </div>
   )
