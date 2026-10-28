@@ -15,7 +15,7 @@ export default function GroupStudentsPage() {
 
   const { data, error, isLoading } = useQuery({
     queryKey: ['group-students', groupId],
-    queryFn: () => apiFetch<Student[]>(`/api/v1/grupos/${groupId}/estudiantes`, token),
+    queryFn: () => apiFetch<Student[]>(`/api/v1/groups/${groupId}/students`, token),
     enabled: !!token && !!groupId,
   })
 
@@ -23,7 +23,7 @@ export default function GroupStudentsPage() {
     <main>
       <h1>Estudiantes matriculados</h1>
       <p>
-        <Link to="/grupos">← Volver a grupos</Link>
+        <Link to="/groups">← Volver a grupos</Link>
       </p>
       <p className="subtitle">Seleccione un estudiante para consultar o registrar sus calificaciones.</p>
       {isLoading && <p>Cargando información…</p>}
@@ -37,7 +37,7 @@ export default function GroupStudentsPage() {
         <ul>
           {data.map((student) => (
             <li key={student.id}>
-              <Link to={`/grupos/${groupId}/estudiantes/${student.id}`}>{student.name}</Link>
+              <Link to={`/groups/${groupId}/students/${student.id}`}>{student.name}</Link>
             </li>
           ))}
         </ul>

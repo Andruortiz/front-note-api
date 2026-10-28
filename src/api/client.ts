@@ -27,5 +27,8 @@ export async function apiFetch<T>(
         const body = await response.json().catch(() => null)
         throw new ApiError(response.status, body?.code ?? 'UNKNOWN', body?.message ?? response.statusText)
     }
+    if (response.status === 204) {
+        return undefined as T
+    }
     return response.json()
 }

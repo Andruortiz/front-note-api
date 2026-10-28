@@ -11,9 +11,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route element={<AppLayout />}>
-          <Route path="/grupos" element={<GroupsPage />} />
-          <Route path="/grupos/:groupId" element={<GroupStudentsPage />} />
-          <Route path="/grupos/:groupId/estudiantes/:studentId" element={<StudentGradesPage />} />
+          <Route path="/groups" element={<GroupsPage />} />
+          <Route path="/groups/:groupId" element={<GroupStudentsPage />} />
+          <Route path="/groups/:groupId/students/:studentId" element={<StudentGradesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -5,7 +5,7 @@ export default function HomePage() {
   const auth = useAuth()
 
   if (auth.isLoading) return <p>Cargando información…</p>
-  if (auth.isAuthenticated) return <Navigate to="/grupos" replace />
+  if (auth.isAuthenticated) return <Navigate to="/groups" replace />
 
   return (
     <div className="page">
