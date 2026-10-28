@@ -21,11 +21,12 @@ export default function GroupStudentsPage() {
 
   return (
     <main>
-      <h1>Estudiantes del grupo</h1>
+      <h1>Estudiantes matriculados</h1>
       <p>
-        <Link to="/grupos">Volver a grupos</Link>
+        <Link to="/grupos">← Volver a grupos</Link>
       </p>
-      {isLoading && <p>Cargando...</p>}
+      <p className="subtitle">Seleccione un estudiante para consultar o registrar sus calificaciones.</p>
+      {isLoading && <p>Cargando información…</p>}
       {error && (
         <p className="error">
           {error instanceof ApiError ? error.message : 'Error inesperado.'}
